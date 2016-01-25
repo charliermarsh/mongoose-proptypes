@@ -6,12 +6,12 @@
     "scripts": {
         "test": "node test.js"
     },
-    "dependencies": {
-        "react": "^0.11.1",
-        "underscore": "^1.6.0",
-        "mongoose": "^3.8.14"
+    "peerDependencies": {
+        "react": ">=0.11.1",
+        "mongoose": ">=3.8.14"
     },
     "devDependencies": {
+        "underscore": "^1.6.0",
         "sinon": "^1.10.3"
     },
     "keywords": [
