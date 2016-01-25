@@ -1,18 +1,17 @@
 var React = require('react');
 var mongoose = require('mongoose');
-var _ = require('underscore');
 
 function getPropType(schemaType) {
-    if (_.isArray(schemaType)) {
+    if (Array.isArray(schemaType)) {
         if (schemaType.length > 0) {
-            schemaType = _.head(schemaType);
+            schemaType = schemaType[0];
             return React.PropTypes.arrayOf(getPropType(schemaType));
         } else {
             return React.PropTypes.array;
         }
-    } else if (_.isObject(schemaType) && !_.isFunction(schemaType)) {
+    } else if (typeof schemaType === 'object' && typeof schemaType !== 'function') {
         var shape = {};
-        _.each(schemaType, function(subType, name) {
+        schemaType.forEach(function(subType, name) {
             shape[name] = getPropType(subType);
         });
         return React.PropTypes.shape(shape);
@@ -38,18 +37,18 @@ function getPropType(schemaType) {
 
 function expandPath(expandedSchema, pieces, value) {
     if (pieces.length > 1) {
-        var root = _.head(pieces);
+        var root = pieces[0];
         expandedSchema[root] = expandedSchema[root] || {};
-        expandPath(expandedSchema[root], _.rest(pieces), value);
+        expandPath(expandedSchema[root], pieces.slice(1), value);
     } else {
-        expandedSchema[_.head(pieces)] = value;
+        expandedSchema[pieces[0]] = value;
     }
 }
 
 function generatePropTypes(Schema) {
     // Expand out dot paths
     var expandedSchema = {};
-    _.each(Schema.paths, function(obj) {
+    Schema.paths.forEach(function(obj) {
         var pieces = obj.path.split('.');
         var type = obj.options.type;
         expandPath(expandedSchema, pieces, type);
@@ -57,7 +56,7 @@ function generatePropTypes(Schema) {
 
     // Map Mongoose schema types to React propTypes
     var propTypes = {};
-    _.each(expandedSchema, function(type, propName) {
+    expandedSchema.forEach(function(type, propName) {
         propTypes[propName] = getPropType(type);
     });
     return propTypes;
